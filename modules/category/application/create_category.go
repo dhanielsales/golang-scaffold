@@ -1,6 +1,8 @@
 package category_application
 
 import (
+	"fmt"
+
 	"golang.org/x/net/context"
 
 	category "github.com/dhanielsales/golang-scaffold/modules/category/entity"
@@ -16,6 +18,8 @@ func (s *CategoryService) Create(ctx context.Context, data CreateCategoryPayload
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(category)
 
 	if err := s.storage.Create(ctx, category); err != nil {
 		return err

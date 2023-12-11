@@ -1,32 +1,34 @@
 package http
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/swagger"
+	"context"
+	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 type HttpServer struct {
-	App  *fiber.App
+	App  *echo.Echo
 	port string
 }
 
 func Bootstrap(port string) *HttpServer {
 	// create the fiber app
-	app := fiber.New()
+	app := echo.New()
 
 	// add middleware
-	app.Use(cors.New())
-	app.Use(logger.New())
+	app.Use(middleware.CORS())
+	app.Use(middleware.Logger())
 
 	// add health check
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.SendString("Healthy!")
+	app.GET("/health", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Healthy!")
 	})
 
 	// add docs
-	app.Get("/swagger/*", swagger.HandlerDefault)
+	app.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	return &HttpServer{
 		App:  app,
@@ -35,9 +37,9 @@ func Bootstrap(port string) *HttpServer {
 }
 
 func (h *HttpServer) Start() {
-	h.App.Listen("0.0.0.0:" + h.port)
+	h.App.Start("0.0.0.0:" + h.port)
 }
 
 func (h *HttpServer) Cleanup() {
-	h.App.Shutdown()
+	h.App.Shutdown(context.Background())
 }

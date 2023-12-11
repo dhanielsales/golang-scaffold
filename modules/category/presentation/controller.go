@@ -2,8 +2,9 @@ package category_http
 
 import (
 	"fmt"
+	"net/http"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/labstack/echo/v4"
 
 	category_application "github.com/dhanielsales/golang-scaffold/modules/category/application"
 )
@@ -31,26 +32,26 @@ type createCategoryRequest struct {
 // @Param Category body createCategoryRequest true "Category to create"
 // @Success 201
 // @Router /category [post]
-func (t *CategoryController) create(c *fiber.Ctx) error {
+func (t *CategoryController) create(c echo.Context) error {
 	var req createCategoryRequest
-	if err := c.BodyParser(req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		fmt.Println(err.Error())
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		return c.JSON(http.StatusBadRequest, echo.Map{
 			"message": "Invalid request body",
 		})
 	}
 
-	err := t.service.Create(c.Context(), category_application.CreateCategoryPayload{
+	err := t.service.Create(c.Request().Context(), category_application.CreateCategoryPayload{
 		Name:        req.Name,
 		Description: req.Description,
 	})
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "Failed to create category",
 		})
 	}
 
-	return c.Status(fiber.StatusCreated).Send(nil)
+	return c.NoContent(http.StatusNoContent)
 }
 
 // @Summary Get all categories.
@@ -60,14 +61,14 @@ func (t *CategoryController) create(c *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} []category_entity.Category
 // @Router /category [get]
-func (t *CategoryController) getAll(c *fiber.Ctx) error {
-	categories, err := t.service.GetAll(c.Context())
+func (t *CategoryController) getAll(c echo.Context) error {
+	categories, err := t.service.GetAll(c.Request().Context())
 	if err != nil {
 		fmt.Println(err.Error())
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Failed to get categories",
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "Failed to get category",
 		})
 	}
 
-	return c.JSON(categories)
+	return c.JSON(http.StatusOK, categories)
 }

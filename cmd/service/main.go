@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/dhanielsales/golang-scaffold/config"
 	_ "github.com/dhanielsales/golang-scaffold/docs"
@@ -23,10 +24,10 @@ type service struct {
 
 func new(env config.EnvVars) (*service, error) {
 	// init the Mongodb storage
-	// mongodb, err := mongo.Bootstrap(env.MONGODB_URI, env.MONGODB_NAME, 10*time.Second)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	mongodb, err := mongo.Bootstrap(env.MONGODB_URI, env.MONGODB_NAME, 10*time.Second)
+	if err != nil {
+		return nil, err
+	}
 
 	// init the Postgres storage
 	postgres, err := postgres.Bootstrap(env.POSTGRES_URI)
@@ -41,8 +42,8 @@ func new(env config.EnvVars) (*service, error) {
 	category.Bootstrap(postgres, httpServer)
 
 	return &service{
-		http: httpServer,
-		// mongodb:  mongodb,
+		http:     httpServer,
+		mongodb:  mongodb,
 		postgres: postgres,
 		env:      env,
 	}, nil

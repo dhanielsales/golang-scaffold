@@ -15,7 +15,7 @@ type categorySchema struct {
 	Name        string         `db:"name"`
 	Description sql.NullString `db:"description"`
 	CreatedAt   int64          `db:"created_at"`
-	UpdatedAt   int64          `db:"updated_at"`
+	UpdatedAt   sql.NullInt64  `db:"updated_at"`
 }
 
 func (s *CategoryStorage) Create(ctx context.Context, data *category.Category) error {

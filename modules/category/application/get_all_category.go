@@ -20,7 +20,7 @@ func (s *CategoryService) GetAll(ctx context.Context) (*[]category.Category, err
 			Name:        dbCategory.Name,
 			Description: dbCategory.Description.String,
 			CreatedAt:   dbCategory.CreatedAt,
-			UpdatedAt:   dbCategory.UpdatedAt,
+			UpdatedAt:   dbCategory.UpdatedAt.Int64,
 		})
 	}
 
